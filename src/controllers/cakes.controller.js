@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import dayjs from "dayjs";
 
 import cakesRepository from "../repositories/cakes.repository.js";
 
@@ -11,12 +12,7 @@ async function createCake(req, res) {
     }
 
     try {
-        const existingCake = await cakesRepository.getCakeByName(name);
-        if (existingCake.rowCount > 0) {
-            res.sendStatus(409);
-            return;
-        }
-
+        await cakesRepository.hasCake(res, name);
         await cakesRepository.createNewCake(name, price, image, description);
 
         res.sendStatus(201);

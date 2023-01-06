@@ -13,6 +13,15 @@ async function getCakeByName(name) {
     );
 }
 
+async function hasCake(res, name) {
+    const existingCake = await getCakeByName(name);
+
+    if (existingCake.rowCount > 0) {
+        res.sendStatus(409);
+        return;
+    }
+}
+
 async function createNewCake(name, price, image, description) {
     return connection.query(
         `
@@ -26,7 +35,7 @@ async function createNewCake(name, price, image, description) {
 }
 
 const cakesRepository = {
-    getCakeByName,
+    hasCake,
     createNewCake,
 };
 
