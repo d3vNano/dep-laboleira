@@ -7,6 +7,8 @@ async function createOrder(req, res) {
     const { client_id, cake_id, quantity, total_price } = req.body;
 
     try {
+        await ordersRepository.hasClientId(client_id);
+        await ordersRepository.hasCakeId(cake_id);
         await ordersRepository.createNewOrder(
             client_id,
             cake_id,
