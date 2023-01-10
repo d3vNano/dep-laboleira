@@ -27,4 +27,22 @@ async function createClient(req, res) {
     }
 }
 
-export { createClient };
+async function listAClientOrders(req, res) {
+    const { id } = req.params;
+
+    try {
+        await clientsRepository.hasClientById(res, id);
+        const clientOrders = await clientsRepository.listAllClientOrders(id);
+        res.send(clientOrders.rows);
+    } catch (error) {
+        console.log(
+            chalk.redBright(
+                dayjs().format("YYYY-MM-DD HH:mm:ss"),
+                error.message
+            )
+        );
+        res.sendStatus(500);
+    }
+}
+
+export { createClient, listAClientOrders };

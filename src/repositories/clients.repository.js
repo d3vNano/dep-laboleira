@@ -56,11 +56,37 @@ async function createNewClient(name, address, phone) {
     );
 }
 
+async function listAllClientOrders(id) {
+    return connection.query(
+        `
+        SELECT
+            orders.id AS order_id,
+            orders.quantity,
+            orders.created_at,
+            orders.total_price,
+            cakes.name AS cake_name
+        FROM
+            orders
+        JOIN
+            cakes
+        ON
+            orders.cake_id = cakes.id
+        JOIN
+            clients
+        ON
+            orders.client_id = clients.id
+        WHERE
+            clients.id = $1`,
+        [id]
+    );
+}
+
 const clientsRepository = {
     getClientById,
     hasClientById,
     hasClientByPhone,
     createNewClient,
+    listAllClientOrders,
 };
 
 export default clientsRepository;
