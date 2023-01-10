@@ -60,4 +60,23 @@ async function listOrders(req, res) {
     }
 }
 
-export { createOrder, listOrders };
+async function listAnOrder(req, res) {
+    const { id } = req.params;
+
+    try {
+        await ordersRepository.hasOrderById(res, id);
+        const order = await ordersRepository.listAllOrdersById(id);
+
+        res.send(order.rows[0]);
+    } catch (error) {
+        console.log(
+            chalk.redBright(
+                dayjs().format("YYYY-MM-DD HH:mm:ss"),
+                error.message
+            )
+        );
+        res.sendStatus(500);
+    }
+}
+
+export { createOrder, listOrders, listAnOrder };

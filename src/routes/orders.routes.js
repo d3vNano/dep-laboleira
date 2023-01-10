@@ -5,7 +5,11 @@ import {
     validateSchema,
     orderRouteValidator,
 } from "../middlewares/validator.middleware.js";
-import { createOrder, listOrders } from "../controllers/orders.controller.js";
+import {
+    createOrder,
+    listOrders,
+    listAnOrder,
+} from "../controllers/orders.controller.js";
 
 const ordersRouter = Router();
 
@@ -17,5 +21,7 @@ ordersRouter.post(
 );
 
 ordersRouter.get("/orders", listOrders);
+
+ordersRouter.get("/orders/:id", listAnOrder);
 
 export default ordersRouter;
