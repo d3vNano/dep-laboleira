@@ -1,5 +1,27 @@
 import connection from "../database/db.js";
 
+async function getClientById(client_id) {
+    return connection.query(
+        `
+        SELECT
+            *
+        FROM
+            clients
+        WHERE
+            id = $1`,
+        [client_id]
+    );
+}
+
+async function hasClientById(res, client_id) {
+    const existingClient = await getClientById(client_id);
+
+    if (!existingClient.rowCount > 0) {
+        res.status(409).send("Cliente não encontrado! ");
+        return;
+    }
+}
+
 async function getClientByPhone(phone) {
     return connection.query(
         `
@@ -13,7 +35,7 @@ async function getClientByPhone(phone) {
     );
 }
 
-async function hasClient(res, phone) {
+async function hasClientByPhone(res, phone) {
     const existingClient = await getClientByPhone(phone);
 
     if (existingClient.rowCount > 0) {
@@ -35,7 +57,9 @@ async function createNewClient(name, address, phone) {
 }
 
 const clientsRepository = {
-    hasClient,
+    getClientById,
+    hasClientById,
+    hasClientByPhone,
     createNewClient,
 };
 

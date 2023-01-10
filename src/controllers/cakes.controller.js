@@ -12,7 +12,7 @@ async function createCake(req, res) {
     }
 
     try {
-        await cakesRepository.hasCake(res, name);
+        await cakesRepository.hasCakeByName(res, name);
         await cakesRepository.createNewCake(name, price, image, description);
 
         res.sendStatus(201);

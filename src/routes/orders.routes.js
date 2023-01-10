@@ -5,7 +5,7 @@ import {
     validateSchema,
     orderRouteValidator,
 } from "../middlewares/validator.middleware.js";
-import { createOrder } from "../controllers/orders.controller.js";
+import { createOrder, listOrders } from "../controllers/orders.controller.js";
 
 const ordersRouter = Router();
 
@@ -15,5 +15,7 @@ ordersRouter.post(
     orderRouteValidator,
     createOrder
 );
+
+ordersRouter.get("/orders", listOrders);
 
 export default ordersRouter;

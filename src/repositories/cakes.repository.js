@@ -1,5 +1,27 @@
 import connection from "../database/db.js";
 
+async function getCakeById(cake_id) {
+    return connection.query(
+        `
+        SELECT
+            *
+        FROM
+            cakes
+        WHERE
+            id = $1`,
+        [cake_id]
+    );
+}
+
+async function hasCakeById(res, cake_id) {
+    const existingCake = await getCakeById(cake_id);
+
+    if (!existingCake.rowCount > 0) {
+        res.status(409).send("Cake não encontrado!");
+        return;
+    }
+}
+
 async function getCakeByName(name) {
     return connection.query(
         `
@@ -13,7 +35,7 @@ async function getCakeByName(name) {
     );
 }
 
-async function hasCake(res, name) {
+async function hasCakeByName(res, name) {
     const existingCake = await getCakeByName(name);
 
     if (existingCake.rowCount > 0) {
@@ -35,7 +57,9 @@ async function createNewCake(name, price, image, description) {
 }
 
 const cakesRepository = {
-    hasCake,
+    getCakeById,
+    hasCakeById,
+    hasCakeByName,
     createNewCake,
 };
 

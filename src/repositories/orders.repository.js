@@ -1,7 +1,7 @@
-import { func } from "joi";
-import connection from "../database/db";
+import connection from "../database/db.js";
 
-async function createNewOrder(client_id, cake_id, quantity, total_price) {
+async function createNewOrder(res, client_id, cake_id, quantity) {
+    const { cake } = res.locals;
     return connection.query(
         `
         INSERT INTO
@@ -9,58 +9,83 @@ async function createNewOrder(client_id, cake_id, quantity, total_price) {
             (client_id, cake_id, quantity, total_price)
         VALUES
             ($1, $2, $3, $4)`,
-        [client_id, cake_id, quantity, total_price]
+        [client_id, cake_id, quantity, quantity * cake.price]
     );
 }
 
-async function getClientById(client_id) {
+async function listAllOrdersByDate(date) {
     return connection.query(
         `
         SELECT
-            *
+            json_build_object(
+                'id', clients.id,
+                'name', clients.name,
+                'address', clients.address,
+                'phone', clients.phone
+            ) AS client,
+            json_build_object(
+                'id', cakes.id,
+                'name', cakes.name,
+                'price', cakes.price,
+                'image', cakes.image,
+                'description', cakes.description
+            ) AS cake,
+            orders.id AS order_id,
+            orders.quantity,
+            orders.total_price
         FROM
+            orders
+        JOIN
             clients
-        WHERE
-            id = $1`,
-        [client_id]
+        ON
+            orders.client_id = clients.id
+        JOIN
+            cakes
+        ON
+            orders.cake_id = cakes.id
+        WHERE date_trunc('day', created_at) = $1`,
+        [date]
     );
 }
 
-async function hasClientId(res, client_id) {
-    const existingClient = await getClientById(client_id);
-
-    if (existingClient.rowCount > 0) {
-        res.sendStatus(404);
-        return;
-    }
-}
-
-async function getCakeById(cake_id) {
+async function listAllOrders() {
     return connection.query(
         `
         SELECT
-            *
+            json_build_object(
+                'id', clients.id,
+                'name', clients.name,
+                'address', clients.address,
+                'phone', clients.phone
+            ) AS client,
+            json_build_object(
+                'id', cakes.id,
+                'name', cakes.name,
+                'price', cakes.price,
+                'image', cakes.image,
+                'description', cakes.description
+            ) AS cake,
+            orders.id AS order_id,
+            orders.quantity,
+            orders.total_price
         FROM
+            orders
+        JOIN
+            clients
+        ON
+            orders.client_id = clients.id
+        JOIN
             cakes
-        WHERE
-            id = $1`,
-        [cake_id]
+        ON
+            orders.cake_id = cakes.id
+        `
     );
-}
-
-async function hasCakeId(res, cake_id) {
-    const existingCake = await getCakeById(cake_id);
-
-    if (existingCake.rowCount > 0) {
-        res.sendStatuss(404);
-        return;
-    }
 }
 
 const ordersRepository = {
     createNewOrder,
-    hasClientId,
-    hasCakeId,
+    listAllOrdersByDate,
+    listAllOrders,
 };
 
 export default ordersRepository;

@@ -12,7 +12,7 @@ async function createClient(req, res) {
     }
 
     try {
-        await clientsRepository.hasClient(res, phone);
+        await clientsRepository.hasClientByPhone(res, phone);
         await clientsRepository.createNewClient(name, address, phone);
 
         res.sendStatus(201);
